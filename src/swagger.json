@@ -1,0 +1,1570 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Sign Contact API",
+    "description": "Esta API REST é responsável por cadastrar clientes que podem ter muitos contatos associados",
+    "version": "1.00"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3333",
+      "description": "Development env"
+    },
+    {
+      "url": "https://desafio-fullstack-api.onrender.com",
+      "description": "Production env"
+    }
+  ],
+  "paths": {
+    "/clients": {
+      "get": {
+        "description": "Rota responsável por buscar todos os clientes cadastrados. Apenas administradores podem ter acesso",
+        "tags": ["Rotas sem parâmetros"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "examples": {
+                  "response": {
+                    "value": [
+                      {
+                        "id": "e1ff15a2-568c-44fd-8c6c-0626a36764bb",
+                        "fullName": "dddd",
+                        "email": "xatualizado@gmail.com",
+                        "admin": false,
+                        "phone": "21343545323",
+                        "createdAt": "2024-01-29T17:37:57.948Z"
+                      },
+                      {
+                        "id": "573cc334-d9a5-4f13-b34f-4a373806f03d",
+                        "fullName": "admin",
+                        "email": "admin@gmail.com",
+                        "admin": true,
+                        "phone": "3456576667",
+                        "createdAt": "2024-01-29T17:38:50.949Z"
+                      },
+                      {
+                        "id": "6a51ef71-c365-4ffc-b4fc-d8e92e04cd9a",
+                        "fullName": "zzz",
+                        "email": "z@gmail.com",
+                        "admin": true,
+                        "phone": "32456789",
+                        "createdAt": "2024-01-30T20:58:05.985Z"
+                      },
+                      {
+                        "id": "22826d08-10d6-4191-93d4-747c5d824a5a",
+                        "fullName": "Abel",
+                        "email": "abel@gmail.com",
+                        "admin": true,
+                        "phone": "41983843902",
+                        "createdAt": "2024-02-05T17:59:25.756Z"
+                      },
+                      {
+                        "id": "ac0d7199-ee97-4f7e-a03a-540f87e0b670",
+                        "fullName": "yatualizadosdcx",
+                        "email": "yatualizado@email.com",
+                        "admin": false,
+                        "phone": "345657666744",
+                        "createdAt": "2024-01-30T20:59:08.813Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["admin"]
+          }
+        ]
+      },
+      "post": {
+        "description": "Rota responsável por cadastrar um novo cliente",
+        "tags": ["Rotas sem parâmetros"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createClient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/createClientResponse"
+                },
+                "examples": {
+                  "client": {
+                    "value": {
+                      "id": "22826d08-10d6-4191-93d4-747c5d824a5a",
+                      "fullName": "Abel",
+                      "email": "abel@gmail.com",
+                      "admin": true,
+                      "phone": "41983843902",
+                      "createdAt": "2024-02-05T17:59:25.756Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "emailConflictError": {
+                    "value": {
+                      "message": "Email Already exists"
+                    }
+                  },
+                  "phoneConflictError": {
+                    "value": {
+                      "message": "Phone Already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "bodyValidationError": {
+                    "value": {
+                      "message": {
+                        "fullName": ["Required"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "security": [{}]
+      }
+    },
+    "/clients/:id": {
+      "get": {
+        "description": "Rota responsável por buscar o cliente informado bem como os seus respectivos contatos",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do cliente que se deseja buscar",
+            "name": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "response": {
+                    "value": {
+                      "id": "22826d08-10d6-4191-93d4-747c5d824a5a",
+                      "fullName": "Abel",
+                      "email": "abel@gmail.com",
+                      "admin": true,
+                      "phone": "41983843902",
+                      "createdAt": "2024-02-05T17:59:25.756Z",
+                      "contacts": [
+                        {
+                          "id": "a163d2ac-fb5d-4a56-8aa4-5164dfd750b7",
+                          "fullName": "contato 2 atualizadoss do yyy",
+                          "email": [
+                            "emamailatualizadoyyy@email.com",
+                            "email5yyyy@email.com"
+                          ],
+                          "phone": ["345364598697"],
+                          "createdAt": "2024-02-05T18:07:09.305Z",
+                          "client_id": "22826d08-10d6-4191-93d4-747c5d824a5a"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["read:clients", "admin"]
+          }
+        ]
+      },
+      "patch": {
+        "description": "Rota responsável por atualizar os dados do cliente informado",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do cliente que se deseja buscar",
+            "name": "id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/updateOneClient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/createClientResponse"
+                },
+                "examples": {
+                  "client": {
+                    "value": {
+                      "id": "ac0d7199-ee97-4f7e-a03a-540f87e0b670",
+                      "fullName": "yatualizadosdcx",
+                      "email": "yatualizado@email.com",
+                      "admin": false,
+                      "phone": "345657666744",
+                      "createdAt": "2024-01-30T20:59:08.813Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "emailConflictError": {
+                    "value": {
+                      "message": "Email Already exists"
+                    }
+                  },
+                  "phoneConflictError": {
+                    "value": {
+                      "message": "Phone Already exists"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["update:clients", "admin"]
+          }
+        ]
+      },
+      "delete": {
+        "description": "Rota responsável por deletar os dados do usuário informado",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do cliente que deseja buscar",
+            "name": "id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Body content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["delete:clients", "admin"]
+          }
+        ]
+      }
+    },
+    "/login": {
+      "post": {
+        "description": "Rota responsável por realizar o login dos clientes",
+        "tags": ["Rotas sem parâmetros"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/clientLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "logged",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/clientLoginResponse"
+                },
+                "examples": {
+                  "token": {
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmdWxsTmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWUsImlhdCI6MTcwNzI0NjcyNSwiZXhwIjoxNzA3MzE4NzI1LCJzdWIiOiI1NzNjYzMzNC1kOWE1LTRmMTMtYjM0Zi00YTM3MzgwNmYwM2QifQ.PJ6Ye3Jm_9HZpxZWBzVkrnG8G1fMIrsRWwHjPww6Qyg",
+                      "client": {
+                        "id": "9e3fa7d9-1b41-477b-9158-1572010b2549",
+                        "fullName": "Admin",
+                        "email": "admin@gmail.com"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidCredentialError": {
+                    "value": {
+                      "message": "Invalid Credentials !"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "bodyValidationError": {
+                    "value": {
+                      "message": {
+                        "email": ["Required"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{}]
+      }
+    },
+    "/contacts": {
+      "get": {
+        "description": "Rota responsável por buscar os contatos atrelados aos clientes",
+        "tags": ["Rotas sem parâmetros"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                },
+                "examples": {
+                  "response": {
+                    "value": [
+                      {
+                        "id": "6872a285-bf7a-4fa1-b94f-af6fa5f2fc9f",
+                        "fullName": "contato 1  da helo",
+                        "email": ["emai1@emai.com", "email2@email.com"],
+                        "phone": ["43253545674", "3435467687"],
+                        "createdAt": "2024-02-01T23:55:43.689Z",
+                        "client_id": "573cc334-d9a5-4f13-b34f-4a373806f03d",
+                        "client": {
+                          "fullName": "admin",
+                          "email": "admin@gmail.com",
+                          "admin": true,
+                          "phone": "3456576667",
+                          "createdAt": "2024-01-29T17:38:50.949Z"
+                        }
+                      },
+                      {
+                        "id": "3bb7df0d-5a5b-4c43-9826-ac14a9656eb8",
+                        "fullName": "contato 2  da helo",
+                        "email": ["emai4@emai.com", "email4@email.com"],
+                        "phone": ["4367899", "43567890-"],
+                        "createdAt": "2024-02-02T00:02:50.904Z",
+                        "client_id": "573cc334-d9a5-4f13-b34f-4a373806f03d",
+                        "client": {
+                          "fullName": "admin",
+                          "email": "admin@gmail.com",
+                          "admin": true,
+                          "phone": "3456576667",
+                          "createdAt": "2024-01-29T17:38:50.949Z"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["read:contacts", "admin"]
+          }
+        ]
+      },
+      "post": {
+        "description": "Rota responsável por atrelar um contato a um cliente",
+        "tags": ["Rotas sem parâmetros"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/createContact"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/createContactResponse"
+                },
+                "examples": {
+                  "contact": {
+                    "value": {
+                      "id": "2d8c9413-e961-44df-ad9c-446448fbaafc",
+                      "fullName": "contato 3  do yyy",
+                      "email": ["email1doyl@email.com", "email4doy@email.com"],
+                      "phone": ["41984454567"],
+                      "createdAt": "2024-02-05T18:30:54.989Z",
+                      "client_id": "ac0d7199-ee97-4f7e-a03a-540f87e0b670"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "bodyValidationError": {
+                    "value": {
+                      "message": {
+                        "fullName": ["Required"],
+                        "phone": ["Invalid input"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["create:contacts"]
+          }
+        ]
+      }
+    },
+    "/contacts/:id": {
+      "get": {
+        "description": "Rota responsável por buscar o contato informado",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do contato  que se deseja buscar",
+            "name": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "response": {
+                    "value": {
+                      "id": "2d8c9413-e961-44df-ad9c-446448fbaafc",
+                      "fullName": "contato 3  do yyy",
+                      "email": ["email1doyl@email.com", "email4doy@email.com"],
+                      "phone": ["41984454567"],
+                      "createdAt": "2024-02-05T18:30:54.989Z",
+                      "client_id": "ac0d7199-ee97-4f7e-a03a-540f87e0b670",
+                      "client": {
+                        "fullName": "yatualizadosdcx",
+                        "email": "yatualizado@email.com",
+                        "admin": false,
+                        "phone": "345657666744",
+                        "createdAt": "2024-01-30T20:59:08.813Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["read:contacts", "admin"]
+          }
+        ]
+      },
+      "patch": {
+        "description": "Rota responsável por atualizar os dados do contato informado",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do contato  que se deseja buscar",
+            "name": "id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/updateOneContact"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/updateContactResponse"
+                },
+                "examples": {
+                  "contact": {
+                    "value": {
+                      "id": "a163d2ac-fb5d-4a56-8aa4-5164dfd750b7",
+                      "fullName": "contato 2 atualizadoss do yyy",
+                      "email": [
+                        "emamailatualizadoyyy@email.com",
+                        "email5yyyy@email.com"
+                      ],
+                      "phone": ["345364598697"],
+                      "createdAt": "2024-02-05T18:07:09.305Z",
+                      "client_id": "22826d08-10d6-4191-93d4-747c5d824a5a"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["update:contacts", "admin"]
+          }
+        ]
+      },
+      "delete": {
+        "description": "Rota responsável por deletar o contato de um cliente",
+        "tags": ["Rotas com parâmetros"],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "description": "Id do contato  que se deseja buscar",
+            "name": "id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Body content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTokenError": {
+                    "value": {
+                      "message": "Missing Bearer Token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "permissionError": {
+                    "value": {
+                      "message": "Insufficient Permissions"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "NotFoundError": {
+                    "value": {
+                      "message": "Client not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": ["delete:contacts", "admin"]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "createClient": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 3,
+            "maxLength": 45
+          },
+          "admin": {
+            "type": "boolean",
+            "default": false
+          },
+          "password": {
+            "type": "string",
+            "minLength": 45,
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 18
+          }
+        },
+        "required": ["fullName", "email", "phone", "password"]
+      },
+      "createClientResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "admin": {
+            "type": "boolean"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "readOneClient": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 3,
+            "maxLength": 45
+          },
+          "admin": {
+            "type": "boolean",
+            "default": false
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 18
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contacts": {
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fullName": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "email": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "format": "email",
+                      "minLength": 3,
+                      "maxLength": 45
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 3,
+                        "maxLength": 45
+                      }
+                    }
+                  ]
+                },
+                "phone": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 18
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 18
+                      }
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "client_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "readAllClients": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "fullName": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 80
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "minLength": 3,
+              "maxLength": 45
+            },
+            "admin": {
+              "type": "boolean",
+              "default": false
+            },
+            "phone": {
+              "type": "string",
+              "maxLength": 18
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "updateOneClient": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 3,
+            "maxLength": 45
+          },
+          "password": {
+            "type": "string",
+            "minLength": 45,
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 18
+          }
+        }
+      },
+      "clientLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 3,
+            "maxLength": 45
+          },
+          "password": {
+            "type": "string",
+            "minLength": 45,
+            "maxLength": 120
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "clientLoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 30
+          }
+        }
+      },
+      "createContact": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                }
+              }
+            ]
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 18
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 18
+                }
+              }
+            ]
+          }
+        },
+        "required": ["fullName", "email", "phone"]
+      },
+      "createContactResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                }
+              }
+            ]
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 18
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 18
+                }
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "client_id": {
+            "type": "string"
+          }
+        }
+      },
+      "readOneContact": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                }
+              }
+            ]
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 18
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 18
+                }
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client": {
+            "type": "object",
+            "properties": {
+              "fullName": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 80
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              "admin": {
+                "type": "boolean",
+                "default": false
+              },
+              "phone": {
+                "type": "string",
+                "maxLength": 18
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "readAllContacts": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "fullName": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 80
+            },
+            "email": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "email",
+                    "minLength": 3,
+                    "maxLength": 45
+                  }
+                }
+              ]
+            },
+            "phone": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "maxLength": 18
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 18
+                  }
+                }
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client": {
+              "type": "object",
+              "properties": {
+                "fullName": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                },
+                "admin": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "phone": {
+                  "type": "string",
+                  "maxLength": 18
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "updateOneContact": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                }
+              }
+            ]
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 18
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 18
+                }
+              }
+            ]
+          }
+        }
+      },
+      "updateContactResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 80
+          },
+          "email": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "minLength": 3,
+                "maxLength": 45
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "email",
+                  "minLength": 3,
+                  "maxLength": 45
+                }
+              }
+            ]
+          },
+          "phone": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 18
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 18
+                }
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "client_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "JWT": [
+        "read:clients",
+        "update:clients",
+        "delete:clients",
+        "create:contacts",
+        "read:contacts",
+        "delete:contacts",
+        "update:contacts",
+        "admin"
+      ]
+    }
+  ]
+}
