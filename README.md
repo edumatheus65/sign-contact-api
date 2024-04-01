@@ -21,7 +21,7 @@ Esta API REST tem a responsabilidade de gerenciar o cadastro de clientes, cada u
 
 
 ## Passos para a API rodar:
-Clone o repositório para o seu ambiente local
-No diretório do projeto, execute o comando npm install para instalar todas as dependências necessárias.
-Execute o comando npx prisma migrate dev --name migration para rodar as migrações do banco de dados. Certifique-se de substituir "migration" pelo nome da migração
-Para iniciar o servidor, utilize o comando npm run dev. Isso iniciará a API e a disponibilizará para acesso
+1. Clone o repositório para o seu ambiente local.
+2. No diretório do projeto, execute o comando `npm install` para instalar todas as dependências necessárias.
+3. Execute o comando `npx prisma migrate dev --name migration` para rodar as migrações do banco de dados. Certifique-se de substituir "migration" pelo nome da migração.
+4. Para iniciar o servidor, utilize o comando `npm run dev`. Isso iniciará a API e a disponibilizará para acesso.
