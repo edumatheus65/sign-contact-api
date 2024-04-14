@@ -10,9 +10,13 @@ import {
 export const createClientController = async (
   req: Request,
   res: Response
-): Promise<Response> => {
-  const newClient = await createClientService(req.body);
-  return res.status(201).json(newClient);
+) => {
+  try {
+    const newClient = await createClientService(req.body);
+    return res.status(201).json(newClient);    
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const readClientsController = async (
