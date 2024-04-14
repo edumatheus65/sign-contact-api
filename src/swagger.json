@@ -11,7 +11,7 @@
       "description": "Development env"
     },
     {
-      "url": "https://desafio-fullstack-api.onrender.com",
+      "url": "https://sign-contact-api-c652ffd9ef2a.herokuapp.com",
       "description": "Production env"
     }
   ],
